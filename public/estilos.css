@@ -72,3 +72,6 @@ h2{font-size:1.3rem;margin:1.2em 0 .6em}
 .kit{background:#fff7e6;border:2px solid #e8b44c;border-radius:12px;padding:4px 16px 14px;margin:12px 0}
 .kit h2{font-size:1.15rem;margin:.6em 0 .3em}
 .kit p{margin:.3em 0 .7em}
+.kit-casilla{display:flex;gap:10px;align-items:flex-start;background:#fff7e6;border:2px solid #e8b44c;border-radius:10px;padding:10px 12px;margin:6px 0}
+.kit-casilla input{width:22px;height:22px;margin:2px 0 0;flex:none}
+.kit-casilla label{font-weight:600}

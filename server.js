@@ -441,6 +441,7 @@ function vistaCheckout(req, res, { error = '', datos = {} } = {}) {
   const carrito = leerCarrito(req);
   const { lineas, total } = lineasCarrito(carrito);
   if (!lineas.length) return redirigir(req, res, '/carrito');
+  const kit = kitEsencial(carrito);
   const cuerpo = `
   <h1>Finalizar compra</h1>
   <p>Compra como invitado. El pago es simulado: no te pediremos ningún dato de tarjeta.</p>
@@ -450,7 +451,6 @@ function vistaCheckout(req, res, { error = '', datos = {} } = {}) {
     <p><strong>Total: ${eur(total)}</strong> (IVA incluido${total >= 500 ? ', envío gratis' : ', envío de 49 € a la entrega'}${total >= 1500 ? ', montaje gratis' : ''})</p>
     <p><a href="/carrito">Modificar carrito</a></p>
   </div>
-  ${bloqueKit(carrito, '/checkout')}
   ${error ? `<p class="error" role="alert">${esc(error)}</p>` : ''}
   <form method="post" action="/checkout" class="form-checkout">
     <label for="nombre">Nombre y apellidos</label>
@@ -459,7 +459,13 @@ function vistaCheckout(req, res, { error = '', datos = {} } = {}) {
     <input id="email" name="email" type="email" autocomplete="email" required value="${esc(datos.email)}">
     <label for="direccion">Dirección de entrega (calle, número, código postal y ciudad)</label>
     <input id="direccion" name="direccion" autocomplete="street-address" required value="${esc(datos.direccion)}">
-    <button type="submit" class="boton grande">Pagar ${eur(total)} (pago simulado)</button>
+    ${kit.items.length ? `
+    <div class="kit-casilla">
+      <input type="checkbox" id="kit" name="kit" value="si"${datos.kit === 'no' ? '' : ' checked'}>
+      <label for="kit">Incluir lo imprescindible para estrenar tu compra (+${eur(kit.importe)}): ${kit.items.map((p) => esc(p.nombre)).join(', ')}. ${kit.items.some((p) => p.categoria === 'textil') ? 'La cama y el colchón se entregan sin ropa de cama.' : ''}</label>
+    </div>
+    <p class="nota">Total a pagar: <strong>${eur(total + kit.importe)}</strong> con lo imprescindible incluido, o ${eur(total)} si desmarcas la casilla.</p>` : ''}
+    <button type="submit" class="boton grande">Pagar y confirmar pedido (pago simulado)</button>
   </form>`;
   enviar(req, res, error ? 422 : 200, pagina({ titulo: `Finalizar compra · ${TIENDA}`, descripcion: 'Introduce tus datos de envío y confirma tu pedido. Pago simulado, sin registro.', cuerpo, carrito }));
 }
@@ -492,13 +498,15 @@ async function procesarCheckout(req, res) {
   const email = (datos.email || '').trim().slice(0, 120);
   const direccion = (datos.direccion || '').trim().slice(0, 250);
   const carrito = leerCarrito(req);
-  const { lineas, total } = lineasCarrito(carrito);
-  if (!lineas.length) return redirigir(req, res, '/carrito');
+  const kitMarcado = datos.kit === 'si';
+  if (!Object.keys(carrito).length) return redirigir(req, res, '/carrito');
   const errores = [];
   if (!nombre) errores.push('el nombre');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errores.push('un correo electrónico válido');
   if (!direccion) errores.push('la dirección de entrega');
-  if (errores.length) return vistaCheckout(req, res, { error: `Falta ${errores.join(', ')}.`, datos: { nombre, email, direccion } });
+  if (errores.length) return vistaCheckout(req, res, { error: `Falta ${errores.join(', ')}.`, datos: { nombre, email, direccion, kit: kitMarcado ? 'si' : 'no' } });
+  if (kitMarcado) for (const p of kitEsencial(carrito).items) carrito[p.sku] = Math.min(20, (carrito[p.sku] || 0) + 1);
+  const { lineas, total } = lineasCarrito(carrito);
 
   const pedido = {
     schema_version: '1.0',
@@ -510,7 +518,7 @@ async function procesarCheckout(req, res) {
     total,
   };
   const r = await enviarPedido(pedido);
-  if (!r.ok) return vistaCheckout(req, res, { error: r.error, datos: { nombre, email, direccion } });
+  if (!r.ok) return vistaCheckout(req, res, { error: r.error, datos: { nombre, email, direccion, kit: kitMarcado ? 'si' : 'no' } });
   console.log('Pedido enviado', pedido.order_id, pedido.total);
   guardarCarrito(res, {});
   const cuerpo = `
