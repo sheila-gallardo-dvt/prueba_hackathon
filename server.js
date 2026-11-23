@@ -323,6 +323,47 @@ function bloquePack(carrito, volver) {
   </section>`;
 }
 
+// Kit esencial: pocos productos, imprescindibles para usar lo que se ha comprado
+function kitEsencial(carrito) {
+  const ps = Object.keys(carrito).map((s) => POR_SKU.get(s));
+  const cats = new Set(ps.map((p) => p.categoria));
+  const anchoCama = Math.max(0, ...ps.filter((p) => p.categoria === 'cama' || p.categoria === 'colchon').map((p) => p.ancho_cm || 0));
+  const lista = [];
+  if (anchoCama >= 135) lista.push(['funda-nordica-150-todo-el-ano', 'funda nórdica'], ['juego-de-sabanas-150', 'sábanas'], ['protector-de-colchon-impermeable-150', 'protector de colchón'], ['pack-2-almohadas-viscoelasticas', 'almohadas']);
+  if (cats.has('escritorio')) lista.push(['flexo-led-regulable', 'flexo para el escritorio']);
+  let total = lineasCarrito(carrito).total;
+  const items = [];
+  for (const [sku] of lista) {
+    const p = POR_SKU.get(sku);
+    if (carrito[sku] || total + p.precio > PRESUPUESTO_TOPE) continue;
+    items.push(p); total += p.precio;
+  }
+  return { items, importe: Math.round(items.reduce((a, p) => a + aCent(p.precio), 0)) / 100 };
+}
+
+function bloqueKit(carrito, volver) {
+  const { items, importe } = kitEsencial(carrito);
+  if (!items.length) return '';
+  const cama = items.some((p) => p.categoria === 'textil');
+  return `
+  <section class="kit" aria-labelledby="kit-titulo">
+    <h2 id="kit-titulo">${cama ? 'Imprescindible: tu cama llega sin ropa de cama' : 'Imprescindible para tu escritorio'}</h2>
+    <p>${cama ? 'La cama y el colchón se entregan sin textiles. Para poder dormir en ella el primer día necesitas' : 'Para trabajar con buena luz necesitas'}: ${items.map((p) => `${esc(p.nombre)} (${eur(p.precio)})`).join(', ')}. Total ${eur(importe)}.</p>
+    <form method="post" action="/carrito/kit">
+      <input type="hidden" name="volver" value="${esc(volver)}">
+      <button type="submit" class="boton">Añadir lo imprescindible (+${eur(importe)})</button>
+    </form>
+  </section>`;
+}
+
+async function anadirKit(req, res) {
+  const d = formulario(await leerCuerpo(req));
+  const carrito = leerCarrito(req);
+  for (const p of kitEsencial(carrito).items) carrito[p.sku] = Math.min(20, (carrito[p.sku] || 0) + 1);
+  guardarCarrito(res, carrito);
+  redirigir(req, res, d.volver === '/checkout' ? '/checkout' : '/carrito?pack=1');
+}
+
 async function anadirPack(req, res) {
   const d = formulario(await leerCuerpo(req));
   const carrito = leerCarrito(req);
@@ -360,6 +401,7 @@ function vistaCarrito(req, res, mensaje = '') {
     cuerpo = `
     <h1>Tu carrito</h1>
     ${mensaje ? `<p class="ok" role="status">${esc(mensaje)}</p>` : ''}
+    ${bloqueKit(carrito, '/carrito')}
     <div class="tabla-scroll"><table class="carrito">
       <thead><tr><th scope="col">Producto</th><th scope="col">Precio</th><th scope="col">Cantidad</th><th scope="col">Subtotal</th></tr></thead>
       <tbody>
@@ -388,8 +430,8 @@ function vistaCarrito(req, res, mensaje = '') {
       <p>${faltaEnvio > 0 ? `Te faltan <strong>${eur(faltaEnvio)}</strong> para el envío gratis.` : '✔ Envío gratis incluido.'}
       ${faltaMontaje > 0 ? `Te faltan <strong>${eur(faltaMontaje)}</strong> para el montaje a domicilio gratis.` : '✔ Montaje a domicilio gratis incluido.'}</p>
     </div>
-    ${bloquePack(carrito, '/carrito')}
     <p><a class="boton grande" href="/checkout">Finalizar compra</a> <a class="boton-sec" href="/">Seguir comprando</a></p>
+    ${bloquePack(carrito, '/carrito')}
     ${sug.length ? `<section class="seccion"><h2>Completa tu compra: lo que más se lleva junto a lo que has elegido</h2><div class="rejilla">${sug.map(tarjeta).join('')}</div></section>` : ''}`;
   }
   enviar(req, res, 200, pagina({ titulo: `Carrito · ${TIENDA}`, descripcion: 'Revisa los productos de tu carrito y finaliza tu compra como invitado.', cuerpo, carrito }));
@@ -408,7 +450,7 @@ function vistaCheckout(req, res, { error = '', datos = {} } = {}) {
     <p><strong>Total: ${eur(total)}</strong> (IVA incluido${total >= 500 ? ', envío gratis' : ', envío de 49 € a la entrega'}${total >= 1500 ? ', montaje gratis' : ''})</p>
     <p><a href="/carrito">Modificar carrito</a></p>
   </div>
-  ${bloquePack(carrito, '/checkout')}
+  ${bloqueKit(carrito, '/checkout')}
   ${error ? `<p class="error" role="alert">${esc(error)}</p>` : ''}
   <form method="post" action="/checkout" class="form-checkout">
     <label for="nombre">Nombre y apellidos</label>
@@ -574,6 +616,7 @@ async function manejar(req, res) {
   if (m === 'POST' && ruta === '/carrito/anadir') return anadir(req, res);
   if (m === 'POST' && ruta === '/carrito/actualizar') return actualizar(req, res);
   if (m === 'POST' && ruta === '/carrito/pack') return anadirPack(req, res);
+  if (m === 'POST' && ruta === '/carrito/kit') return anadirKit(req, res);
   if (m === 'POST' && ruta === '/checkout') return procesarCheckout(req, res);
   if (m === 'POST' && ruta === '/asistente') return vistaAsistente(req, res);
   if (m === 'POST' && ruta === '/api/asistente') return apiAsistente(req, res);

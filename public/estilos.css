@@ -69,3 +69,6 @@ h2{font-size:1.3rem;margin:1.2em 0 .6em}
 .pack h2{margin-top:.6em}
 .pack-lista{padding-left:20px}
 .motivo{color:var(--suave);font-size:.9rem}
+.kit{background:#fff7e6;border:2px solid #e8b44c;border-radius:12px;padding:4px 16px 14px;margin:12px 0}
+.kit h2{font-size:1.15rem;margin:.6em 0 .3em}
+.kit p{margin:.3em 0 .7em}
