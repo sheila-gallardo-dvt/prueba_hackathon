@@ -371,6 +371,25 @@ async function anadirKit(req, res) {
   redirigir(req, res, d.volver === '/checkout' ? '/checkout' : '/carrito?pack=1');
 }
 
+function avisoEntrega(carrito) {
+  const total = lineasCarrito(carrito).total;
+  if (total >= UMBRAL_GRATIS) return '';
+  const { items, importe } = packComplementos(carrito);
+  const conPack = total + importe;
+  const extra = COSTE_ENVIO + COSTE_MONTAJE;
+  const salidaSin = total + extra;
+  return `
+  <section class="aviso-entrega" aria-labelledby="aviso-titulo">
+    <h2 id="aviso-titulo">Atención: así como está, tu pedido te sale caro</h2>
+    <p>Sin llegar a ${eur(UMBRAL_GRATIS)} pagarás en la entrega <strong>${eur(COSTE_ENVIO)} de envío + ${eur(COSTE_MONTAJE)} de montaje</strong>. Gasto total: <strong>${eur(salidaSin)}</strong>, y esos ${eur(extra)} no te dan ningún producto.</p>
+    ${items.length && conPack >= UMBRAL_GRATIS ? `<p>Con el pack de complementos (${items.length} productos: ropa de cama, mesillas, lámparas, textil del salón, accesorios de escritorio y almacenaje) tu pedido es de <strong>${eur(conPack)}</strong>, con <strong>envío y montaje gratis</strong>, y sigues por debajo de 4.000 €. Es decir: por ${eur(conPack - salidaSin)} más que pagando envío y montaje te llevas ${eur(importe)} en productos.</p>
+    <form method="post" action="/carrito/pack">
+      <input type="hidden" name="volver" value="/checkout">
+      <button type="submit" class="boton grande">Añadir el pack y no pagar envío ni montaje (+${eur(importe)})</button>
+    </form>` : ''}
+  </section>`;
+}
+
 async function anadirPack(req, res) {
   const d = formulario(await leerCuerpo(req));
   const carrito = leerCarrito(req);
@@ -458,6 +477,7 @@ function vistaCheckout(req, res, { error = '', datos = {} } = {}) {
     <p><strong>Total productos: ${eur(total)}</strong> (IVA incluido). ${total >= UMBRAL_GRATIS ? 'Envío y montaje gratis.' : `Envío ${eur(COSTE_ENVIO)} y montaje ${eur(COSTE_MONTAJE)} a pagar en la entrega (gratis desde ${eur(UMBRAL_GRATIS)}: te faltan ${eur(UMBRAL_GRATIS - total)}, <a href="/carrito">añade el pack de complementos</a>).`}</p>
     <p><a href="/carrito">Modificar carrito</a></p>
   </div>
+  ${avisoEntrega(carrito)}
   ${error ? `<p class="error" role="alert">${esc(error)}</p>` : ''}
   <form method="post" action="/checkout" class="form-checkout">
     <label for="nombre">Nombre y apellidos</label>
@@ -472,7 +492,7 @@ function vistaCheckout(req, res, { error = '', datos = {} } = {}) {
       <label for="kit">Incluir lo imprescindible para estrenar tu compra (+${eur(kit.importe)}): ${kit.items.map((p) => esc(p.nombre)).join(', ')}. ${kit.items.some((p) => p.categoria === 'textil') ? 'La cama y el colchón se entregan sin ropa de cama.' : ''}</label>
     </div>
     <p class="nota">Total a pagar: <strong>${eur(total + kit.importe)}</strong> con lo imprescindible incluido, o ${eur(total)} si desmarcas la casilla.</p>` : ''}
-    <button type="submit" class="boton grande">Pagar y confirmar pedido (pago simulado)</button>
+    <button type="submit" class="boton grande">${total + kit.importe >= UMBRAL_GRATIS ? 'Pagar y confirmar pedido (pago simulado)' : `Pagar y confirmar (pago simulado; en la entrega pagarás ${eur(COSTE_ENVIO + COSTE_MONTAJE)} más de envío y montaje)`}</button>
   </form>`;
   enviar(req, res, error ? 422 : 200, pagina({ titulo: `Finalizar compra · ${TIENDA}`, descripcion: 'Introduce tus datos de envío y confirma tu pedido. Pago simulado, sin registro.', cuerpo, carrito }));
 }
