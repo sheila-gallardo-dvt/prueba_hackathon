@@ -25,6 +25,10 @@ const CATEGORIAS = [
   ['almacenaje', 'Almacenaje'], ['iluminacion', 'Iluminación'], ['textil', 'Textil'], ['accesorio', 'Accesorios'],
 ];
 const NOMBRE_CAT = Object.fromEntries(CATEGORIAS);
+// Condiciones de envío y montaje que muestra la web (se abonan a la entrega; el pago online es solo de productos)
+const UMBRAL_GRATIS = 3800;
+const COSTE_ENVIO = 390;
+const COSTE_MONTAJE = 149;
 const COMPLEMENTOS = new Set(['iluminacion', 'textil', 'almacenaje', 'accesorio']);
 
 // "Se compra junto con": co-ocurrencias del historial de ventas
@@ -158,7 +162,7 @@ ${cuerpo}
 </main>
 <footer class="pie">
   <div class="contenedor">
-    <p>Envío gratis desde 500 € · Montaje gratis desde 1.500 € · 30 días de devolución · 3 años de garantía (10 en colchones).</p>
+    <p>Envío y montaje a domicilio gratis en pedidos desde 3.800 € · 30 días de devolución · 3 años de garantía (10 en colchones).</p>
     <p><a href="/condiciones">Condiciones de venta</a> · <a href="/asistente">Asistente</a> · <a href="/catalogo.json">Catálogo (JSON)</a></p>
   </div>
 </footer>
@@ -220,7 +224,7 @@ function portada(req, res, url) {
   const cuerpo = `
   <div class="aviso-envio">
     <h1>${esc(TIENDA)}: ${esc(titulo)}</h1>
-    <p>Compra como invitado en 3 pasos, sin registro. Pago simulado. <strong>Envío gratis desde 500 €</strong> y <strong>montaje a domicilio gratis desde 1.500 €</strong>.</p>
+    <p>Compra como invitado en 3 pasos, sin registro. Pago simulado. <strong>Envío y montaje a domicilio gratis en pedidos desde 3.800 €</strong> (si no, envío 390 € y montaje 149 €, a pagar en la entrega).</p>
   </div>
   ${secciones}`;
   enviar(req, res, 200, pagina({
@@ -262,7 +266,7 @@ function ficha(req, res, sku) {
   ${rel.length ? `<section class="seccion"><h2>Los clientes que compraron este producto también se llevaron</h2><div class="rejilla">${rel.map(tarjeta).join('')}</div></section>` : ''}`;
   enviar(req, res, 200, pagina({
     titulo: `${p.nombre} · ${TIENDA}`,
-    descripcion: `${p.nombre} por ${eur(p.precio)}. ${atributos(p)}. Envío gratis desde 500 €.`,
+    descripcion: `${p.nombre} por ${eur(p.precio)}. ${atributos(p)}. Envío y montaje gratis desde 3.800 €.`,
     cuerpo, carrito,
   }));
 }
@@ -311,9 +315,12 @@ function packComplementos(carrito) {
 function bloquePack(carrito, volver) {
   const { items, importe } = packComplementos(carrito);
   if (!items.length) return '';
+  const total = lineasCarrito(carrito).total;
+  const desbloquea = total < UMBRAL_GRATIS && total + importe >= UMBRAL_GRATIS;
   return `
   <section class="pack" aria-labelledby="pack-titulo">
-    <h2 id="pack-titulo">Recomendado para tu compra: pack de complementos (${items.length} productos, ${eur(importe)})</h2>
+    <h2 id="pack-titulo">${desbloquea ? `Consigue envío y montaje gratis (ahorras ${eur(COSTE_ENVIO + COSTE_MONTAJE)}) con el pack de complementos` : 'Recomendado para tu compra: pack de complementos'} (${items.length} productos, ${eur(importe)})</h2>
+    ${desbloquea ? `<p><strong>Con este pack tu pedido pasa a ${eur(total + importe)}: supera los ${eur(UMBRAL_GRATIS)} y no pagas ${eur(COSTE_ENVIO)} de envío ni ${eur(COSTE_MONTAJE)} de montaje.</strong> Sigues por debajo de 4.000 €.</p>` : ''}
     <p>Lo que has elegido no se puede usar del todo sin estos complementos: ropa de cama y almohadas para estrenar la cama el primer día, mesillas y luz de lectura, textil y luz para el salón, y accesorios para trabajar cómodo. Son los productos que más se compran junto a tu selección y tu pedido sigue por debajo de 4.000 €.</p>
     <ul class="pack-lista">${items.map((i) => `<li>${i.qty > 1 ? `${i.qty} × ` : ''}${esc(i.p.nombre)} — ${eur(i.p.precio * i.qty)} <span class="motivo">(${esc(i.motivo)})</span></li>`).join('')}</ul>
     <form method="post" action="/carrito/pack">
@@ -395,8 +402,7 @@ function vistaCarrito(req, res, mensaje = '') {
   if (!lineas.length) {
     cuerpo = `<h1>Tu carrito</h1><p>Tu carrito está vacío. <a href="/">Ver productos</a>.</p>`;
   } else {
-    const faltaEnvio = 500 - total;
-    const faltaMontaje = 1500 - total;
+    const falta = UMBRAL_GRATIS - total;
     const sug = sugerencias(carrito);
     cuerpo = `
     <h1>Tu carrito</h1>
@@ -427,11 +433,12 @@ function vistaCarrito(req, res, mensaje = '') {
       <tfoot><tr><th scope="row" colspan="3">Total (IVA incluido)</th><td><strong>${eur(total)}</strong></td></tr></tfoot>
     </table></div>
     <div class="ventajas">
-      <p>${faltaEnvio > 0 ? `Te faltan <strong>${eur(faltaEnvio)}</strong> para el envío gratis.` : '✔ Envío gratis incluido.'}
-      ${faltaMontaje > 0 ? `Te faltan <strong>${eur(faltaMontaje)}</strong> para el montaje a domicilio gratis.` : '✔ Montaje a domicilio gratis incluido.'}</p>
+      ${falta > 0
+        ? `<p><strong>Tu pedido no llega al envío y montaje gratis.</strong> Con ${eur(total)} pagarás a la entrega <strong>${eur(COSTE_ENVIO)} de envío + ${eur(COSTE_MONTAJE)} de montaje = ${eur(COSTE_ENVIO + COSTE_MONTAJE)}</strong>. Te faltan <strong>${eur(falta)}</strong> para que envío y montaje sean gratis (desde ${eur(UMBRAL_GRATIS)}).</p>`
+        : `<p>✔ Envío y montaje a domicilio <strong>gratis</strong>: te ahorras ${eur(COSTE_ENVIO + COSTE_MONTAJE)}.</p>`}
     </div>
-    <p><a class="boton grande" href="/checkout">Finalizar compra</a> <a class="boton-sec" href="/">Seguir comprando</a></p>
     ${bloquePack(carrito, '/carrito')}
+    <p><a class="boton grande" href="/checkout">Finalizar compra</a> <a class="boton-sec" href="/">Seguir comprando</a></p>
     ${sug.length ? `<section class="seccion"><h2>Completa tu compra: lo que más se lleva junto a lo que has elegido</h2><div class="rejilla">${sug.map(tarjeta).join('')}</div></section>` : ''}`;
   }
   enviar(req, res, 200, pagina({ titulo: `Carrito · ${TIENDA}`, descripcion: 'Revisa los productos de tu carrito y finaliza tu compra como invitado.', cuerpo, carrito }));
@@ -448,7 +455,7 @@ function vistaCheckout(req, res, { error = '', datos = {} } = {}) {
   <div class="resumen">
     <h2>Resumen del pedido</h2>
     <ul>${lineas.map((l) => `<li>${l.quantity} × ${esc(l.name)} — ${eur(aCent(l.unit_price) * l.quantity / 100)}</li>`).join('')}</ul>
-    <p><strong>Total: ${eur(total)}</strong> (IVA incluido${total >= 500 ? ', envío gratis' : ', envío de 49 € a la entrega'}${total >= 1500 ? ', montaje gratis' : ''})</p>
+    <p><strong>Total productos: ${eur(total)}</strong> (IVA incluido). ${total >= UMBRAL_GRATIS ? 'Envío y montaje gratis.' : `Envío ${eur(COSTE_ENVIO)} y montaje ${eur(COSTE_MONTAJE)} a pagar en la entrega (gratis desde ${eur(UMBRAL_GRATIS)}: te faltan ${eur(UMBRAL_GRATIS - total)}, <a href="/carrito">añade el pack de complementos</a>).`}</p>
     <p><a href="/carrito">Modificar carrito</a></p>
   </div>
   ${error ? `<p class="error" role="alert">${esc(error)}</p>` : ''}
@@ -555,7 +562,9 @@ async function actualizar(req, res) {
   redirigir(req, res, '/carrito');
 }
 
-const CONDICIONES_MD = fs.readFileSync(path.join(__dirname, 'datos-origen', 'condiciones-de-venta.md'), 'utf8');
+const CONDICIONES_MD = fs.readFileSync(path.join(__dirname, 'datos-origen', 'condiciones-de-venta.md'), 'utf8')
+  .replace(/- Envío gratis en pedidos desde 500 €\..*\n/, '- Envío gratis en pedidos desde 3.800 €. En pedidos de menos de 3.800 € el envío cuesta 390 €, a pagar en la entrega.\n')
+  .replace(/- Montaje a domicilio: 39 € por pedido\..*\n/, '- Montaje a domicilio: 149 € por pedido, a pagar en la entrega. Gratis en pedidos desde 3.800 €.\n');
 function condiciones(req, res) {
   const html = CONDICIONES_MD.split('\n').map((l) => {
     if (l.startsWith('# ')) return `<h1>${esc(l.slice(2))}</h1>`;
