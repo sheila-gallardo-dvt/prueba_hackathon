@@ -1,0 +1,9 @@
+{
+  "name": "nido-hogar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tienda online Nido Hogar (hackathon)",
+  "main": "server.js",
+  "scripts": { "start": "node server.js", "catalogo": "node scripts/limpiar.js" },
+  "engines": { "node": ">=20" }
+}

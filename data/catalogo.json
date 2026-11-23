@@ -1,0 +1,706 @@
+{
+  "productos": [
+    {
+      "sku": "alfombrilla-protectora-para-silla",
+      "ids_origen": [
+        "B-70916"
+      ],
+      "nombre": "Alfombrilla protectora para silla",
+      "categoria": "accesorio",
+      "precio": 29,
+      "plazas": null,
+      "ancho_cm": 120,
+      "color": "natural",
+      "material": "melamina"
+    },
+    {
+      "sku": "reposapies-ergonomico",
+      "ids_origen": [
+        "B-50794"
+      ],
+      "nombre": "Reposapiés ergonómico",
+      "categoria": "accesorio",
+      "precio": 25,
+      "plazas": null,
+      "ancho_cm": 45,
+      "color": "negro",
+      "material": "metal"
+    },
+    {
+      "sku": "soporte-de-monitor-de-madera",
+      "ids_origen": [
+        "B-67452"
+      ],
+      "nombre": "Soporte de monitor de madera",
+      "categoria": "accesorio",
+      "precio": 39,
+      "plazas": null,
+      "ancho_cm": 60,
+      "color": "roble",
+      "material": "madera"
+    },
+    {
+      "sku": "aparador-3-puertas",
+      "ids_origen": [
+        "A-3551"
+      ],
+      "nombre": "Aparador 3 puertas",
+      "categoria": "almacenaje",
+      "precio": 310,
+      "plazas": null,
+      "ancho_cm": 160,
+      "color": "nogal",
+      "material": "madera"
+    },
+    {
+      "sku": "armario-2-puertas-correderas",
+      "ids_origen": [
+        "A-6662"
+      ],
+      "nombre": "Armario 2 puertas correderas",
+      "categoria": "almacenaje",
+      "precio": 340,
+      "plazas": null,
+      "ancho_cm": 150,
+      "color": "blanco",
+      "material": "melamina"
+    },
+    {
+      "sku": "cajonera-con-ruedas-3-cajones",
+      "ids_origen": [
+        "A-4350"
+      ],
+      "nombre": "Cajonera con ruedas 3 cajones",
+      "categoria": "almacenaje",
+      "precio": 79,
+      "plazas": null,
+      "ancho_cm": 40,
+      "color": "blanco",
+      "material": "metal"
+    },
+    {
+      "sku": "estanteria-libreria-5-baldas",
+      "ids_origen": [
+        "B-40144"
+      ],
+      "nombre": "Estantería librería 5 baldas",
+      "categoria": "almacenaje",
+      "precio": 95,
+      "plazas": null,
+      "ancho_cm": 80,
+      "color": "roble",
+      "material": "madera"
+    },
+    {
+      "sku": "mesilla-de-noche-1-cajon",
+      "ids_origen": [
+        "B-23736"
+      ],
+      "nombre": "Mesilla de noche 1 cajón",
+      "categoria": "almacenaje",
+      "precio": 55,
+      "plazas": null,
+      "ancho_cm": 45,
+      "color": "roble",
+      "material": "madera"
+    },
+    {
+      "sku": "cama-brisa-150x200-tapizada",
+      "ids_origen": [
+        "B-36878"
+      ],
+      "nombre": "Cama Brisa 150x200 tapizada",
+      "categoria": "cama",
+      "precio": 610,
+      "plazas": null,
+      "ancho_cm": 165,
+      "color": "gris",
+      "material": "tela"
+    },
+    {
+      "sku": "cama-luna-150x190",
+      "ids_origen": [
+        "A-4961",
+        "B-57833"
+      ],
+      "nombre": "Cama Luna 150x190",
+      "categoria": "cama",
+      "precio": 380,
+      "plazas": null,
+      "ancho_cm": 160,
+      "color": "roble",
+      "material": "madera"
+    },
+    {
+      "sku": "cama-nube-90x190",
+      "ids_origen": [
+        "B-32440"
+      ],
+      "nombre": "Cama Nube 90x190",
+      "categoria": "cama",
+      "precio": 210,
+      "plazas": null,
+      "ancho_cm": 100,
+      "color": "blanco",
+      "material": "madera"
+    },
+    {
+      "sku": "cama-roca-135x190",
+      "ids_origen": [
+        "A-8465",
+        "B-82382"
+      ],
+      "nombre": "Cama Roca 135x190",
+      "categoria": "cama",
+      "precio": 340,
+      "plazas": null,
+      "ancho_cm": 145,
+      "color": "nogal",
+      "material": "madera"
+    },
+    {
+      "sku": "cama-sol-150x190-con-canape",
+      "ids_origen": [
+        "A-1369"
+      ],
+      "nombre": "Cama Sol 150x190 con canapé",
+      "categoria": "cama",
+      "precio": 520,
+      "plazas": null,
+      "ancho_cm": 160,
+      "color": "blanco",
+      "material": "melamina"
+    },
+    {
+      "sku": "colchon-basic-90x190",
+      "ids_origen": [
+        "A-9913"
+      ],
+      "nombre": "Colchón Basic 90x190",
+      "categoria": "colchon",
+      "precio": 149,
+      "plazas": null,
+      "ancho_cm": 90,
+      "color": "blanco",
+      "material": "espuma"
+    },
+    {
+      "sku": "colchon-confort-150x200",
+      "ids_origen": [
+        "A-9287"
+      ],
+      "nombre": "Colchón Confort 150x200",
+      "categoria": "colchon",
+      "precio": 389,
+      "plazas": null,
+      "ancho_cm": 150,
+      "color": "blanco",
+      "material": "espuma"
+    },
+    {
+      "sku": "colchon-descanso-150x190",
+      "ids_origen": [
+        "A-7254"
+      ],
+      "nombre": "Colchón Descanso 150x190",
+      "categoria": "colchon",
+      "precio": 299,
+      "plazas": null,
+      "ancho_cm": 150,
+      "color": "blanco",
+      "material": "espuma"
+    },
+    {
+      "sku": "colchon-firme-135x190",
+      "ids_origen": [
+        "B-22183"
+      ],
+      "nombre": "Colchón Firme 135x190",
+      "categoria": "colchon",
+      "precio": 259,
+      "plazas": null,
+      "ancho_cm": 135,
+      "color": "blanco",
+      "material": "muelles"
+    },
+    {
+      "sku": "colchon-premium-150x190-de-muelles-ensacados",
+      "ids_origen": [
+        "B-98516"
+      ],
+      "nombre": "Colchón Premium 150x190 de muelles ensacados",
+      "categoria": "colchon",
+      "precio": 549,
+      "plazas": null,
+      "ancho_cm": 150,
+      "color": "blanco",
+      "material": "muelles"
+    },
+    {
+      "sku": "escritorio-compacto-100-cm",
+      "ids_origen": [
+        "A-5784"
+      ],
+      "nombre": "Escritorio compacto 100 cm",
+      "categoria": "escritorio",
+      "precio": 99,
+      "plazas": null,
+      "ancho_cm": 100,
+      "color": "roble",
+      "material": "melamina"
+    },
+    {
+      "sku": "escritorio-de-esquina-150-cm",
+      "ids_origen": [
+        "B-84838"
+      ],
+      "nombre": "Escritorio de esquina 150 cm",
+      "categoria": "escritorio",
+      "precio": 219,
+      "plazas": null,
+      "ancho_cm": 150,
+      "color": "nogal",
+      "material": "madera"
+    },
+    {
+      "sku": "escritorio-elevable-electrico-160-cm",
+      "ids_origen": [
+        "A-2229",
+        "B-94536"
+      ],
+      "nombre": "Escritorio elevable eléctrico 160 cm",
+      "categoria": "escritorio",
+      "precio": 429,
+      "plazas": null,
+      "ancho_cm": 160,
+      "color": "negro",
+      "material": "metal"
+    },
+    {
+      "sku": "escritorio-trabajo-140-cm",
+      "ids_origen": [
+        "A-2368"
+      ],
+      "nombre": "Escritorio Trabajo 140 cm",
+      "categoria": "escritorio",
+      "precio": 160,
+      "plazas": null,
+      "ancho_cm": 140,
+      "color": "blanco",
+      "material": "melamina"
+    },
+    {
+      "sku": "flexo-led-regulable",
+      "ids_origen": [
+        "B-85581"
+      ],
+      "nombre": "Flexo LED regulable",
+      "categoria": "iluminacion",
+      "precio": 35,
+      "plazas": null,
+      "ancho_cm": 15,
+      "color": "blanco",
+      "material": "metal"
+    },
+    {
+      "sku": "lampara-de-mesilla-ceramica",
+      "ids_origen": [
+        "A-5441",
+        "B-30739"
+      ],
+      "nombre": "Lámpara de mesilla Cerámica",
+      "categoria": "iluminacion",
+      "precio": 29,
+      "plazas": null,
+      "ancho_cm": 20,
+      "color": "blanco",
+      "material": "ceramica"
+    },
+    {
+      "sku": "lampara-de-pie-arco",
+      "ids_origen": [
+        "B-13338"
+      ],
+      "nombre": "Lámpara de pie Arco",
+      "categoria": "iluminacion",
+      "precio": 89,
+      "plazas": null,
+      "ancho_cm": 40,
+      "color": "negro",
+      "material": "metal"
+    },
+    {
+      "sku": "lampara-de-techo-trenzada",
+      "ids_origen": [
+        "A-9295"
+      ],
+      "nombre": "Lámpara de techo Trenzada",
+      "categoria": "iluminacion",
+      "precio": 59,
+      "plazas": null,
+      "ancho_cm": 50,
+      "color": "natural",
+      "material": "lino"
+    },
+    {
+      "sku": "mesa-de-cocina-sil-plegable",
+      "ids_origen": [
+        "A-4669",
+        "B-84789"
+      ],
+      "nombre": "Mesa de cocina Sil plegable",
+      "categoria": "mesa",
+      "precio": 129,
+      "plazas": null,
+      "ancho_cm": 80,
+      "color": "blanco",
+      "material": "metal"
+    },
+    {
+      "sku": "mesa-de-comedor-duero-redonda",
+      "ids_origen": [
+        "A-2964",
+        "B-52063"
+      ],
+      "nombre": "Mesa de comedor Duero redonda",
+      "categoria": "mesa",
+      "precio": 360,
+      "plazas": null,
+      "ancho_cm": 110,
+      "color": "nogal",
+      "material": "madera"
+    },
+    {
+      "sku": "mesa-de-comedor-ebro-extensible",
+      "ids_origen": [
+        "B-20825"
+      ],
+      "nombre": "Mesa de comedor Ebro extensible",
+      "categoria": "mesa",
+      "precio": 420,
+      "plazas": null,
+      "ancho_cm": 160,
+      "color": "roble",
+      "material": "madera"
+    },
+    {
+      "sku": "mesa-de-comedor-tajo",
+      "ids_origen": [
+        "A-5805"
+      ],
+      "nombre": "Mesa de comedor Tajo",
+      "categoria": "mesa",
+      "precio": 290,
+      "plazas": null,
+      "ancho_cm": 140,
+      "color": "blanco",
+      "material": "melamina"
+    },
+    {
+      "sku": "pack-2-sillas-industrial",
+      "ids_origen": [
+        "A-4280"
+      ],
+      "nombre": "Pack 2 sillas Industrial",
+      "categoria": "silla",
+      "precio": 99,
+      "plazas": null,
+      "ancho_cm": 42,
+      "color": "negro",
+      "material": "metal"
+    },
+    {
+      "sku": "pack-4-sillas-de-comedor-arena",
+      "ids_origen": [
+        "A-6692",
+        "B-49554"
+      ],
+      "nombre": "Pack 4 sillas de comedor Arena",
+      "categoria": "silla",
+      "precio": 180,
+      "plazas": null,
+      "ancho_cm": 45,
+      "color": "beige",
+      "material": "tela"
+    },
+    {
+      "sku": "pack-4-sillas-de-comedor-roble",
+      "ids_origen": [
+        "B-28073"
+      ],
+      "nombre": "Pack 4 sillas de comedor Roble",
+      "categoria": "silla",
+      "precio": 240,
+      "plazas": null,
+      "ancho_cm": 44,
+      "color": "roble",
+      "material": "madera"
+    },
+    {
+      "sku": "pack-6-sillas-de-comedor-nogal",
+      "ids_origen": [
+        "A-9750",
+        "B-90466"
+      ],
+      "nombre": "Pack 6 sillas de comedor Nogal",
+      "categoria": "silla",
+      "precio": 390,
+      "plazas": null,
+      "ancho_cm": 45,
+      "color": "nogal",
+      "material": "madera"
+    },
+    {
+      "sku": "silla-de-oficina-basic",
+      "ids_origen": [
+        "A-3028",
+        "B-84380"
+      ],
+      "nombre": "Silla de oficina Basic",
+      "categoria": "silla_oficina",
+      "precio": 69,
+      "plazas": null,
+      "ancho_cm": 58,
+      "color": "negro",
+      "material": "tela"
+    },
+    {
+      "sku": "silla-de-oficina-ergonomica-de-malla",
+      "ids_origen": [
+        "B-60749"
+      ],
+      "nombre": "Silla de oficina ergonómica de malla",
+      "categoria": "silla_oficina",
+      "precio": 129,
+      "plazas": null,
+      "ancho_cm": 62,
+      "color": "negro",
+      "material": "malla"
+    },
+    {
+      "sku": "silla-de-oficina-pro-con-reposacabezas",
+      "ids_origen": [
+        "B-65328"
+      ],
+      "nombre": "Silla de oficina Pro con reposacabezas",
+      "categoria": "silla_oficina",
+      "precio": 249,
+      "plazas": null,
+      "ancho_cm": 66,
+      "color": "gris",
+      "material": "malla"
+    },
+    {
+      "sku": "sillon-de-direccion-ejecutivo",
+      "ids_origen": [
+        "A-1971"
+      ],
+      "nombre": "Sillón de dirección Ejecutivo",
+      "categoria": "silla_oficina",
+      "precio": 319,
+      "plazas": null,
+      "ancho_cm": 68,
+      "color": "marron",
+      "material": "piel"
+    },
+    {
+      "sku": "sillon-viena",
+      "ids_origen": [
+        "A-1893"
+      ],
+      "nombre": "Sillón Viena 1 plaza",
+      "categoria": "sofa",
+      "precio": 279,
+      "plazas": 1,
+      "ancho_cm": 80,
+      "color": "beige",
+      "material": "lino"
+    },
+    {
+      "sku": "sofa-aarhus",
+      "ids_origen": [
+        "A-6902",
+        "B-93141"
+      ],
+      "nombre": "Sofá Aarhus 3 plazas",
+      "categoria": "sofa",
+      "precio": 1590,
+      "plazas": 3,
+      "ancho_cm": 215,
+      "color": "marron",
+      "material": "piel"
+    },
+    {
+      "sku": "sofa-alba",
+      "ids_origen": [
+        "B-78559"
+      ],
+      "nombre": "Sofá Alba",
+      "categoria": "sofa",
+      "precio": 599,
+      "plazas": 2,
+      "ancho_cm": 160,
+      "color": "beige",
+      "material": "tela"
+    },
+    {
+      "sku": "sofa-bergen",
+      "ids_origen": [
+        "B-52757"
+      ],
+      "nombre": "Sofá Bergen",
+      "categoria": "sofa",
+      "precio": 1190,
+      "plazas": 3,
+      "ancho_cm": 220,
+      "color": "verde",
+      "material": "terciopelo"
+    },
+    {
+      "sku": "sofa-cama-turku",
+      "ids_origen": [
+        "B-57515"
+      ],
+      "nombre": "Sofá cama Turku",
+      "categoria": "sofa",
+      "precio": 499,
+      "plazas": 2,
+      "ancho_cm": 150,
+      "color": "gris",
+      "material": "tela"
+    },
+    {
+      "sku": "sofa-lund",
+      "ids_origen": [
+        "A-2431"
+      ],
+      "nombre": "Sofá Lund tres plazas",
+      "categoria": "sofa",
+      "precio": 1076.9,
+      "plazas": 3,
+      "ancho_cm": 205,
+      "color": "azul",
+      "material": "tela"
+    },
+    {
+      "sku": "sofa-malmo-con-chaise-longue",
+      "ids_origen": [
+        "A-6232",
+        "B-36536"
+      ],
+      "nombre": "Sofá Malmö con chaise longue",
+      "categoria": "sofa",
+      "precio": 1349,
+      "plazas": 4,
+      "ancho_cm": 280,
+      "color": "gris",
+      "material": "tela"
+    },
+    {
+      "sku": "sofa-nordico",
+      "ids_origen": [
+        "A-1116",
+        "B-65337"
+      ],
+      "nombre": "Sofá Nórdico",
+      "categoria": "sofa",
+      "precio": 849,
+      "plazas": 3,
+      "ancho_cm": 210,
+      "color": "gris",
+      "material": "lino"
+    },
+    {
+      "sku": "alfombra-de-salon-160x230",
+      "ids_origen": [
+        "A-4533"
+      ],
+      "nombre": "Alfombra de salón 160x230",
+      "categoria": "textil",
+      "precio": 89,
+      "plazas": null,
+      "ancho_cm": 160,
+      "color": "beige",
+      "material": "lana"
+    },
+    {
+      "sku": "funda-nordica-150-todo-el-ano",
+      "ids_origen": [
+        "A-5051"
+      ],
+      "nombre": "Funda nórdica 150 todo el año",
+      "categoria": "textil",
+      "precio": 69,
+      "plazas": null,
+      "ancho_cm": 240,
+      "color": "blanco",
+      "material": "algodon"
+    },
+    {
+      "sku": "juego-de-sabanas-150",
+      "ids_origen": [
+        "B-22857"
+      ],
+      "nombre": "Juego de sábanas 150",
+      "categoria": "textil",
+      "precio": 35,
+      "plazas": null,
+      "ancho_cm": 240,
+      "color": "blanco",
+      "material": "algodon"
+    },
+    {
+      "sku": "manta-para-sofa",
+      "ids_origen": [
+        "A-9000"
+      ],
+      "nombre": "Manta para sofá",
+      "categoria": "textil",
+      "precio": 29,
+      "plazas": null,
+      "ancho_cm": 130,
+      "color": "gris",
+      "material": "algodon"
+    },
+    {
+      "sku": "pack-2-almohadas-viscoelasticas",
+      "ids_origen": [
+        "A-3115"
+      ],
+      "nombre": "Pack 2 almohadas viscoelásticas",
+      "categoria": "textil",
+      "precio": 45,
+      "plazas": null,
+      "ancho_cm": 70,
+      "color": "blanco",
+      "material": "espuma"
+    },
+    {
+      "sku": "pack-4-cojines-decorativos",
+      "ids_origen": [
+        "A-5053",
+        "B-21741"
+      ],
+      "nombre": "Pack 4 cojines decorativos",
+      "categoria": "textil",
+      "precio": 39,
+      "plazas": null,
+      "ancho_cm": 45,
+      "color": "verde",
+      "material": "terciopelo"
+    },
+    {
+      "sku": "protector-de-colchon-impermeable-150",
+      "ids_origen": [
+        "B-39342"
+      ],
+      "nombre": "Protector de colchón impermeable 150",
+      "categoria": "textil",
+      "precio": 25,
+      "plazas": null,
+      "ancho_cm": 150,
+      "color": "blanco",
+      "material": "algodon"
+    }
+  ]
+}
