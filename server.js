@@ -467,7 +467,7 @@ function vistaCheckout(req, res, { error = '', datos = {} } = {}) {
   const carrito = leerCarrito(req);
   const { lineas, total } = lineasCarrito(carrito);
   if (!lineas.length) return redirigir(req, res, '/carrito');
-  const kit = kitEsencial(carrito);
+  const kit = packComplementos(carrito);
   const cuerpo = `
   <h1>Finalizar compra</h1>
   <p>Compra como invitado. El pago es simulado: no te pediremos ningún dato de tarjeta.</p>
@@ -477,7 +477,6 @@ function vistaCheckout(req, res, { error = '', datos = {} } = {}) {
     <p><strong>Total productos: ${eur(total)}</strong> (IVA incluido). ${total >= UMBRAL_GRATIS ? 'Envío y montaje gratis.' : `Envío ${eur(COSTE_ENVIO)} y montaje ${eur(COSTE_MONTAJE)} a pagar en la entrega (gratis desde ${eur(UMBRAL_GRATIS)}: te faltan ${eur(UMBRAL_GRATIS - total)}, <a href="/carrito">añade el pack de complementos</a>).`}</p>
     <p><a href="/carrito">Modificar carrito</a></p>
   </div>
-  ${avisoEntrega(carrito)}
   ${error ? `<p class="error" role="alert">${esc(error)}</p>` : ''}
   <form method="post" action="/checkout" class="form-checkout">
     <label for="nombre">Nombre y apellidos</label>
@@ -489,9 +488,10 @@ function vistaCheckout(req, res, { error = '', datos = {} } = {}) {
     ${kit.items.length ? `
     <div class="kit-casilla">
       <input type="checkbox" id="kit" name="kit" value="si"${datos.kit === 'no' ? '' : ' checked'}>
-      <label for="kit">Incluir lo imprescindible para estrenar tu compra (+${eur(kit.importe)}): ${kit.items.map((p) => esc(p.nombre)).join(', ')}. ${kit.items.some((p) => p.categoria === 'textil') ? 'La cama y el colchón se entregan sin ropa de cama.' : ''}</label>
+      <label for="kit">Incluir el pack para completar tu hogar (+${eur(kit.importe)}, ${kit.items.length} productos): ropa de cama, almohadas, mesillas y lámparas para el dormitorio, textil y luz para el salón, accesorios de escritorio y almacenaje. ${total < UMBRAL_GRATIS && total + kit.importe >= UMBRAL_GRATIS ? `Con él superas ${eur(UMBRAL_GRATIS)} y <strong>no pagas ${eur(COSTE_ENVIO)} de envío ni ${eur(COSTE_MONTAJE)} de montaje</strong>.` : ''} Tu pedido sigue por debajo de 4.000 €.</label>
     </div>
-    <p class="nota">Total a pagar: <strong>${eur(total + kit.importe)}</strong> con lo imprescindible incluido, o ${eur(total)} si desmarcas la casilla.</p>` : ''}
+    <p class="nota">Incluye: ${kit.items.map((i) => `${i.qty > 1 ? `${i.qty} × ` : ''}${esc(i.p.nombre)} (${eur(i.p.precio * i.qty)})`).join(', ')}.</p>
+    <p class="nota">Total a pagar: <strong>${eur(total + kit.importe)}</strong> con el pack, envío y montaje ${total + kit.importe >= UMBRAL_GRATIS ? 'gratis' : 'aparte'}. Si desmarcas la casilla: ${eur(total)} ${total >= UMBRAL_GRATIS ? '' : `+ ${eur(COSTE_ENVIO + COSTE_MONTAJE)} de envío y montaje a la entrega`}.</p>` : ''}
     <button type="submit" class="boton grande">${total + kit.importe >= UMBRAL_GRATIS ? 'Pagar y confirmar pedido (pago simulado)' : `Pagar y confirmar (pago simulado; en la entrega pagarás ${eur(COSTE_ENVIO + COSTE_MONTAJE)} más de envío y montaje)`}</button>
   </form>`;
   enviar(req, res, error ? 422 : 200, pagina({ titulo: `Finalizar compra · ${TIENDA}`, descripcion: 'Introduce tus datos de envío y confirma tu pedido. Pago simulado, sin registro.', cuerpo, carrito }));
@@ -532,7 +532,7 @@ async function procesarCheckout(req, res) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errores.push('un correo electrónico válido');
   if (!direccion) errores.push('la dirección de entrega');
   if (errores.length) return vistaCheckout(req, res, { error: `Falta ${errores.join(', ')}.`, datos: { nombre, email, direccion, kit: kitMarcado ? 'si' : 'no' } });
-  if (kitMarcado) for (const p of kitEsencial(carrito).items) carrito[p.sku] = Math.min(20, (carrito[p.sku] || 0) + 1);
+  if (kitMarcado) for (const i of packComplementos(carrito).items) carrito[i.p.sku] = Math.min(20, (carrito[i.p.sku] || 0) + i.qty);
   const { lineas, total } = lineasCarrito(carrito);
 
   const pedido = {
