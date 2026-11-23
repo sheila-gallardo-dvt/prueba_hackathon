@@ -267,6 +267,71 @@ function ficha(req, res, sku) {
   }));
 }
 
+// ---------- Pack de complementos (venta cruzada de un clic) ----------
+const PRESUPUESTO_TOPE = 3990; // nunca proponemos pasar de 4.000 € en total
+// Complementos que pide cada tipo de mueble, por prioridad: [sku, cantidad, motivo]
+const PACK_POR_CATEGORIA = {
+  cama: [['funda-nordica-150-todo-el-ano', 1, 'ropa de cama'], ['juego-de-sabanas-150', 1, 'ropa de cama'], ['protector-de-colchon-impermeable-150', 1, 'protege el colchón'], ['pack-2-almohadas-viscoelasticas', 1, 'almohadas'], ['mesilla-de-noche-1-cajon', 2, 'una a cada lado'], ['lampara-de-mesilla-ceramica', 2, 'luz de lectura']],
+  colchon: [['protector-de-colchon-impermeable-150', 1, 'protege el colchón'], ['pack-2-almohadas-viscoelasticas', 1, 'almohadas']],
+  sofa: [['manta-para-sofa', 1, 'textil del salón'], ['pack-4-cojines-decorativos', 1, 'textil del salón'], ['alfombra-de-salon-160x230', 1, 'alfombra del salón'], ['lampara-de-pie-arco', 1, 'luz del salón']],
+  mesa: [['lampara-de-techo-trenzada', 1, 'luz del comedor']],
+  escritorio: [['flexo-led-regulable', 1, 'luz de trabajo'], ['soporte-de-monitor-de-madera', 1, 'ergonomía'], ['cajonera-con-ruedas-3-cajones', 1, 'almacenaje del despacho']],
+  silla_oficina: [['reposapies-ergonomico', 1, 'ergonomía'], ['alfombrilla-protectora-para-silla', 1, 'protege el suelo']],
+};
+const ALMACENAJE_HOGAR = [['estanteria-libreria-5-baldas', 1, 'almacenaje'], ['armario-2-puertas-correderas', 1, 'almacenaje del dormitorio'], ['aparador-3-puertas', 1, 'almacenaje del comedor']];
+
+function packComplementos(carrito) {
+  const cats = new Set(Object.keys(carrito).map((s) => POR_SKU.get(s).categoria));
+  const anchoCama = Math.max(0, ...Object.keys(carrito).map((s) => POR_SKU.get(s)).filter((p) => p.categoria === 'cama' || p.categoria === 'colchon').map((p) => p.ancho_cm || 0));
+  const candidatos = [];
+  const orden = ['cama', 'colchon', 'sofa', 'mesa', 'escritorio', 'silla_oficina'];
+  for (const c of orden) if (cats.has(c)) candidatos.push(...PACK_POR_CATEGORIA[c]);
+  if (cats.size >= 2) candidatos.push(...ALMACENAJE_HOGAR);
+  // Unidades extra con sentido para apurar el presupuesto (recambios y segundas unidades)
+  if (cats.has('cama')) candidatos.push(['juego-de-sabanas-150', 2, 'un juego de recambio'], ['pack-2-almohadas-viscoelasticas', 2, 'almohadas para invitados']);
+  if (cats.has('sofa')) candidatos.push(['pack-4-cojines-decorativos', 2, 'cojines para el sillón'], ['manta-para-sofa', 2, 'una manta más']);
+  if (cats.has('mesa')) candidatos.push(['lampara-de-techo-trenzada', 2, 'luz del salón']);
+  let total = lineasCarrito(carrito).total;
+  const elegidos = new Map();
+  for (const [sku, qty, motivo] of candidatos) {
+    const p = POR_SKU.get(sku);
+    if (!p || carrito[sku]) continue;
+    if (/150/.test(sku) && anchoCama && anchoCama < 135) continue; // ropa de 150 solo para camas de matrimonio
+    const previo = elegidos.get(sku);
+    if (previo && previo.qty >= qty) continue;
+    const coste = p.precio * (qty - (previo ? previo.qty : 0));
+    if (total + coste > PRESUPUESTO_TOPE) continue;
+    elegidos.set(sku, previo ? { p, qty, motivo: `${previo.motivo} + ${motivo}` } : { p, qty, motivo });
+    total += coste;
+  }
+  const items = [...elegidos.values()];
+  return { items, importe: Math.round(items.reduce((a, i) => a + aCent(i.p.precio) * i.qty, 0)) / 100 };
+}
+
+function bloquePack(carrito, volver) {
+  const { items, importe } = packComplementos(carrito);
+  if (!items.length) return '';
+  return `
+  <section class="pack" aria-labelledby="pack-titulo">
+    <h2 id="pack-titulo">Recomendado para tu compra: pack de complementos (${items.length} productos, ${eur(importe)})</h2>
+    <p>Lo que has elegido no se puede usar del todo sin estos complementos: ropa de cama y almohadas para estrenar la cama el primer día, mesillas y luz de lectura, textil y luz para el salón, y accesorios para trabajar cómodo. Son los productos que más se compran junto a tu selección y tu pedido sigue por debajo de 4.000 €.</p>
+    <ul class="pack-lista">${items.map((i) => `<li>${i.qty > 1 ? `${i.qty} × ` : ''}${esc(i.p.nombre)} — ${eur(i.p.precio * i.qty)} <span class="motivo">(${esc(i.motivo)})</span></li>`).join('')}</ul>
+    <form method="post" action="/carrito/pack">
+      <input type="hidden" name="volver" value="${esc(volver)}">
+      <button type="submit" class="boton grande">Añadir el pack completo al carrito (+${eur(importe)})</button>
+    </form>
+  </section>`;
+}
+
+async function anadirPack(req, res) {
+  const d = formulario(await leerCuerpo(req));
+  const carrito = leerCarrito(req);
+  const { items } = packComplementos(carrito);
+  for (const i of items) carrito[i.p.sku] = Math.min(20, (carrito[i.p.sku] || 0) + i.qty);
+  guardarCarrito(res, carrito);
+  redirigir(req, res, d.volver === '/checkout' ? '/checkout' : '/carrito?pack=1');
+}
+
 function sugerencias(carrito, max = 4) {
   const dentro = new Set(Object.keys(carrito));
   const puntos = new Map();
@@ -323,6 +388,7 @@ function vistaCarrito(req, res, mensaje = '') {
       <p>${faltaEnvio > 0 ? `Te faltan <strong>${eur(faltaEnvio)}</strong> para el envío gratis.` : '✔ Envío gratis incluido.'}
       ${faltaMontaje > 0 ? `Te faltan <strong>${eur(faltaMontaje)}</strong> para el montaje a domicilio gratis.` : '✔ Montaje a domicilio gratis incluido.'}</p>
     </div>
+    ${bloquePack(carrito, '/carrito')}
     <p><a class="boton grande" href="/checkout">Finalizar compra</a> <a class="boton-sec" href="/">Seguir comprando</a></p>
     ${sug.length ? `<section class="seccion"><h2>Completa tu compra: lo que más se lleva junto a lo que has elegido</h2><div class="rejilla">${sug.map(tarjeta).join('')}</div></section>` : ''}`;
   }
@@ -342,6 +408,7 @@ function vistaCheckout(req, res, { error = '', datos = {} } = {}) {
     <p><strong>Total: ${eur(total)}</strong> (IVA incluido${total >= 500 ? ', envío gratis' : ', envío de 49 € a la entrega'}${total >= 1500 ? ', montaje gratis' : ''})</p>
     <p><a href="/carrito">Modificar carrito</a></p>
   </div>
+  ${bloquePack(carrito, '/checkout')}
   ${error ? `<p class="error" role="alert">${esc(error)}</p>` : ''}
   <form method="post" action="/checkout" class="form-checkout">
     <label for="nombre">Nombre y apellidos</label>
@@ -495,7 +562,7 @@ async function manejar(req, res) {
 
   if (lectura && ruta === '/') return portada(req, res, url);
   if (lectura && ruta.startsWith('/producto/')) return ficha(req, res, ruta.slice(10));
-  if (lectura && ruta === '/carrito') return vistaCarrito(req, res, url.searchParams.get('anadido') && POR_SKU.has(url.searchParams.get('anadido')) ? `Añadido: ${POR_SKU.get(url.searchParams.get('anadido')).nombre}` : '');
+  if (lectura && ruta === '/carrito') return vistaCarrito(req, res, url.searchParams.get('pack') ? 'Pack de complementos añadido al carrito.' : url.searchParams.get('anadido') && POR_SKU.has(url.searchParams.get('anadido')) ? `Añadido: ${POR_SKU.get(url.searchParams.get('anadido')).nombre}` : '');
   if (lectura && ruta === '/checkout') return vistaCheckout(req, res);
   if (lectura && ruta === '/condiciones') return condiciones(req, res);
   if (lectura && ruta === '/asistente') return vistaAsistente(req, res);
@@ -506,6 +573,7 @@ async function manejar(req, res) {
   if (lectura && ruta === '/salud') return enviar(req, res, 200, 'ok', 'text/plain; charset=utf-8');
   if (m === 'POST' && ruta === '/carrito/anadir') return anadir(req, res);
   if (m === 'POST' && ruta === '/carrito/actualizar') return actualizar(req, res);
+  if (m === 'POST' && ruta === '/carrito/pack') return anadirPack(req, res);
   if (m === 'POST' && ruta === '/checkout') return procesarCheckout(req, res);
   if (m === 'POST' && ruta === '/asistente') return vistaAsistente(req, res);
   if (m === 'POST' && ruta === '/api/asistente') return apiAsistente(req, res);

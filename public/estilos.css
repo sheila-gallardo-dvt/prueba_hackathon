@@ -65,3 +65,7 @@ h2{font-size:1.3rem;margin:1.2em 0 .6em}
 .pie{border-top:1px solid var(--borde);background:#fff;color:var(--suave);font-size:.9rem;padding:10px 0}
 @media (max-width:720px){.ficha{grid-template-columns:1fr}.muestra.grande{height:160px}h1{font-size:1.4rem}
 .carrito thead{display:none}.carrito tr{display:block;border-bottom:1px solid var(--borde);padding:6px 0}.carrito td,.carrito th{display:block;border:0;padding:4px 10px}}
+.pack{background:#fff7e6;border:2px solid #e8b44c;border-radius:12px;padding:6px 18px 16px;margin:16px 0}
+.pack h2{margin-top:.6em}
+.pack-lista{padding-left:20px}
+.motivo{color:var(--suave);font-size:.9rem}
